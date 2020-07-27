@@ -28,7 +28,9 @@ public class ReentrantLock implements Lock {
 
     public ReentrantLock() {
         waitQueue = new LinkedBlockingQueue(100);
+        counter = new AtomicInteger();
     }
+
 
     /**
      * 一直尝试获取锁
@@ -104,21 +106,42 @@ public class ReentrantLock implements Lock {
      * @throws InterruptedException
      */
     public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-        if(owner.get()!=Thread.currentThread()){
-            //TODO 抛出异常
-            throw new IllegalMonitorStateException("当前线程不是执行线程");
+
+        return false;
+    }
+
+    /**
+     * 尝试解锁
+     */
+    public boolean tryUnlock() {
+        int count = counter.get();
+        if (count > 0) {
+            if (owner.get() != Thread.currentThread()) {
+                throw new IllegalMonitorStateException("不能释放不是自己的锁");
+            }
+            // 这里面不做多线程的考虑，因为上面已经保证了操作下面方法的肯定是拥有人线程。
+            count = count - 1;
+            if (count == 0) {
+                owner.set(null);
+                return true;
+            }
+            return true;
+        } else {
+            throw new IllegalMonitorStateException("锁已经释放");
         }
-        int count=    counter.decrementAndGet();
-        if(count<=0){
-            owner.set(null);
-        }
-        return true;
     }
 
     /**
      * 解除锁定
      */
     public void unlock() {
+       if(tryUnlock()){
+           //先释放当前锁的拥有人，如果可以释放，唤醒头部线程。
+           Thread head= waitQueue.peek();
+           if(head!=null){
+               LockSupport.unpark(head);
+           }
+       }
 
     }
 
