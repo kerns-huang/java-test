@@ -4,7 +4,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.LockSupport;
@@ -15,7 +14,7 @@ import java.util.concurrent.locks.LockSupport;
  * @author xiaohei
  * @create 2020-03-25 下午2:18
  **/
-public class ReentrantLock implements Lock {
+public class LocalReentrantLock implements Lock {
 
 
     private AtomicReference<Thread> owner;
@@ -26,9 +25,10 @@ public class ReentrantLock implements Lock {
 
     private LinkedBlockingQueue<Thread> waitQueue;
 
-    public ReentrantLock() {
+    public LocalReentrantLock() {
         waitQueue = new LinkedBlockingQueue(100);
         counter = new AtomicInteger();
+        owner=new AtomicReference<>();
     }
 
 
@@ -121,11 +121,13 @@ public class ReentrantLock implements Lock {
             }
             // 这里面不做多线程的考虑，因为上面已经保证了操作下面方法的肯定是拥有人线程。
             count = count - 1;
+            //设置引用次数减一
+            counter.set(count);
             if (count == 0) {
                 owner.set(null);
                 return true;
             }
-            return true;
+            return false;
         } else {
             throw new IllegalMonitorStateException("锁已经释放");
         }
