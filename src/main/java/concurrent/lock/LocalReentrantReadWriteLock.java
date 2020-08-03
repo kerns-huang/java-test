@@ -77,16 +77,14 @@ public class LocalReentrantReadWriteLock {
                 //查看头部节点owner是否为被设置为空，为空的话头部节点进行消费
                 for (; ; ) {
                     WaitNode waitNode = lock.linkedBlockingQueue.peek();
-                    //waitNode拥有不会为空，因为本身已经塞入等待队列里面去了
-                    if (waitNode != null) {
-                        if (waitNode.thread == Thread.currentThread()) {
-                            //如果头部线程就是当前线程，在获取一次数据
-                            if (tryLock()) {
-                                lock.linkedBlockingQueue.poll();
-                                return;
-                            } else {
-                                LockSupport.park();
-                            }
+                    //waitNode拥有不会为空，因为自身已经塞入等待队列里面去了
+                    if (waitNode.thread == Thread.currentThread()) {
+                        //如果头部线程就是当前线程，在获取一次数据
+                        if (tryLock()) {
+                            lock.linkedBlockingQueue.poll();
+                            return;
+                        } else {
+                            LockSupport.park();
                         }
                     }
                 }
