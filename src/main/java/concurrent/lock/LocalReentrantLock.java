@@ -43,6 +43,7 @@ public class LocalReentrantLock implements Lock {
                 //取头部数据
                 Thread head = waitQueue.peek();
                 if (head == Thread.currentThread()) {
+                    //如果头部等于当前线程
                     if (!tryLock()) {
                         //如果获取不到锁，说明是其它线程还占有的锁。挂起之后什么时候唤醒了，unlock的时候唤醒？
                         LockSupport.park();
