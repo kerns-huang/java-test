@@ -128,7 +128,7 @@ public class LocalReentrantReadWriteLock {
                 }
                 int temp = count - STEP;
                 if (lock.counter.compareAndSet(count, temp)) {
-                    //按照道理有读锁应该是走入不到这一步的。
+                    //按照道理有读锁应该是走入不到这一步的,这里面读锁的问题怎么规避掉
                     if (temp == 0) {
                         //如果不等于，说明还有着写锁存在
                         lock.owner.set(null);
@@ -144,6 +144,13 @@ public class LocalReentrantReadWriteLock {
         }
 
         public void unlock() {
+            if(tryUnLock()){
+                //尝试解锁成功，唤醒头部节点
+                WaitNode waitNode=lock.linkedBlockingQueue.peek();
+                if(waitNode!=null){
+                    LockSupport.unpark(waitNode.thread);
+                }
+            }
 
         }
 

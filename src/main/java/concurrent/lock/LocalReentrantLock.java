@@ -14,7 +14,7 @@ import java.util.concurrent.locks.LockSupport;
  * @author xiaohei
  * @create 2020-03-25 下午2:18
  **/
-public class LocalReentrantLock implements Lock {
+public class LocalReentrantLock  {
 
 
     private AtomicReference<Thread> owner;
@@ -26,8 +26,9 @@ public class LocalReentrantLock implements Lock {
     private LinkedBlockingQueue<Thread> waitQueue;
 
     public LocalReentrantLock() {
+        //阻塞队列
         waitQueue = new LinkedBlockingQueue(100);
-        counter = new AtomicInteger();
+        counter = new AtomicInteger(0);
         owner=new AtomicReference<>();
     }
 
@@ -57,18 +58,8 @@ public class LocalReentrantLock implements Lock {
                 }
             }
         }
-
-
     }
 
-    /**
-     * 尝试获取锁，当被其它线程打断的时候，放弃获取锁
-     *
-     * @throws InterruptedException
-     */
-    public void lockInterruptibly() throws InterruptedException {
-
-    }
 
     /**
      * 尝试获取锁，获取不到锁，直接返回false
@@ -96,19 +87,6 @@ public class LocalReentrantLock implements Lock {
                 return false;
             }
         }
-    }
-
-    /**
-     * 超过多少时间没有获取到锁，就返回false
-     *
-     * @param time
-     * @param unit
-     * @return
-     * @throws InterruptedException
-     */
-    public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-
-        return false;
     }
 
     /**
@@ -142,15 +120,13 @@ public class LocalReentrantLock implements Lock {
            //先释放当前锁的拥有人，如果可以释放，唤醒头部线程。
            Thread head= waitQueue.peek();
            if(head!=null){
+               /**
+                * 解锁头部线程
+                */
                LockSupport.unpark(head);
            }
        }
 
     }
-
-    public Condition newCondition() {
-        return null;
-    }
-
 
 }
