@@ -58,6 +58,7 @@ public class LocalReentrantReadWriteLock {
     }
 
     static class WriteLock {
+        public static final int STEP = 1 << 16;
         /**
          * 不能在这定一个counter ，当 写锁获取数据的时候，没办法保证 读锁不获取数据，所以最好是使用同一个变量
          */
@@ -81,11 +82,14 @@ public class LocalReentrantReadWriteLock {
                     if (waitNode.thread == Thread.currentThread()) {
                         //如果头部线程就是当前线程，在获取一次数据
                         if (tryLock()) {
+                            //如果能够获取到锁，直接弹出等待节点
                             lock.linkedBlockingQueue.poll();
                             return;
                         } else {
                             LockSupport.park();
                         }
+                    } else {
+                        LockSupport.park();
                     }
                 }
             }
@@ -99,18 +103,16 @@ public class LocalReentrantReadWriteLock {
          */
         public boolean tryLock() {
             int count = lock.counter.get();
-            int i = 1 << 16;
             if (lock.owner.get() == null && count == 0) {
                 //如果当前没有写的线程，而且没有读锁,那么设置当前owner，切写count +1
-                if (lock.counter.compareAndSet(count, count + 1)) {
+                if (lock.counter.compareAndSet(count, count + STEP)) {
                     //先保证count是自己，因为counter可能被其它读写线程更改，所以先操作，保证是当前线程修改写count++，然后当前线程在设置成当前线程
                     lock.owner.set(Thread.currentThread());
                 }
                 return false;
-
             } else if (Thread.currentThread() == lock.owner.get()) {
                 //如果锁的拥有人是当前线程，说明只有自己这个写线程在写东西
-                if (lock.counter.compareAndSet(count, count + i)) {
+                if (lock.counter.compareAndSet(count, count + STEP)) {
                     return true;
                 }
                 return false;
@@ -118,7 +120,26 @@ public class LocalReentrantReadWriteLock {
             return false;
         }
 
-        public boolean tryUnLock() {
+        private boolean tryUnLock() {
+            int count = lock.counter.get();
+            if (count > STEP) {
+                if (Thread.currentThread() != lock.owner.get()) {
+                    throw new IllegalMonitorStateException("不能解锁不是本线程的锁");
+                }
+                int temp = count - STEP;
+                if (lock.counter.compareAndSet(count, temp)) {
+                    //按照道理有读锁应该是走入不到这一步的。
+                    if (temp == 0) {
+                        //如果不等于，说明还有着写锁存在
+                        lock.owner.set(null);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
             return false;
         }
 
