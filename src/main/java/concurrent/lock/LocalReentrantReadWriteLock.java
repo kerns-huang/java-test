@@ -17,20 +17,26 @@ public class LocalReentrantReadWriteLock {
     /**
      * 写锁
      */
-    public static final int WRITE_LOCK = 2;
+    private static final int WRITE_LOCK = 2;
     /**
      * 读锁
      */
-    public static final int READ_LOCK = 2;
+    private static final int READ_LOCK = 1;
     /**
      * 写锁的持有线程
      */
     private AtomicReference<Thread> owner = new AtomicReference<>();
-
+    /**
+     * 阻塞队列
+     */
     private LinkedBlockingQueue<WaitNode> linkedBlockingQueue = new LinkedBlockingQueue<>(100);
-
+    /**
+     * 读锁
+     */
     private ReadLock readLock;
-
+    /**
+     * 写锁
+     */
     private WriteLock writeLock;
 
     /**
@@ -57,6 +63,8 @@ public class LocalReentrantReadWriteLock {
         private Thread thread;
         //1: 读锁，2： 写锁
         private int lockType;
+        //添加或者减少的counter次数
+        private int arg;
 
         public WaitNode(Thread thread, int lockType) {
             this.thread = thread;
@@ -205,8 +213,9 @@ public class LocalReentrantReadWriteLock {
          *
          * @return
          */
-        public boolean tryUnLock() {
+        private boolean tryUnLock() {
             int count = lock.counter.get();
+            //判断是否有写锁在
             if (lock.counter.compareAndSet(count, count - 1)) {
                 return true;
             } else {
