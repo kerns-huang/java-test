@@ -14,7 +14,14 @@ import java.util.concurrent.locks.LockSupport;
  * @create 2020-08-01 下午1:36
  **/
 public class LocalReentrantReadWriteLock {
+    /**
+     * 写锁
+     */
     public static final int WRITE_LOCK = 2;
+    /**
+     * 读锁
+     */
+    public static final int READ_LOCK = 2;
     /**
      * 写锁的持有线程
      */
@@ -144,10 +151,10 @@ public class LocalReentrantReadWriteLock {
         }
 
         public void unlock() {
-            if(tryUnLock()){
+            if (tryUnLock()) {
                 //尝试解锁成功，唤醒头部节点
-                WaitNode waitNode=lock.linkedBlockingQueue.peek();
-                if(waitNode!=null){
+                WaitNode waitNode = lock.linkedBlockingQueue.peek();
+                if (waitNode != null) {
                     LockSupport.unpark(waitNode.thread);
                 }
             }
