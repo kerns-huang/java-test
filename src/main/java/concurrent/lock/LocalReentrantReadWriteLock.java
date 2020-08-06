@@ -182,14 +182,16 @@ public class LocalReentrantReadWriteLock {
 
         public void lock() {
             if (!tryLock()) {
-                //添加到阻塞队列
+                //尝试获取锁，如果不成公
                 lock.linkedBlockingQueue.offer(new WaitNode(Thread.currentThread(), 1));
+                //检查在这个时间端，是否当前线程已经释放了排他锁
+                WaitNode waitNode= lock.linkedBlockingQueue.peek();
                 LockSupport.park();
             }
         }
 
         /**
-         * 读锁尝试获取锁的时候，需要判断是否有被写锁占用，如果写锁占用，就没办法
+         * 读锁尝试获取锁的时候，需要判断是否有被写锁占用，如果写锁占用，判断是否是当前线程占用
          *
          * @return
          */
