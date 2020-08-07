@@ -184,14 +184,16 @@ public class ReentrantReadWriteLock
          *
          * <p>Accessed via a benign data race; relies on the memory
          * model's out-of-thin-air guarantees for references.
-         *
-         * <p>This allows tracking of read holds for uncontended read
-         * locks to be very cheap.
+         * 通过良性数据竞赛访问，依赖于
+         * 这允许跟踪未转换读取锁的读取保留非常便宜。
          */
         private transient Thread firstReader = null;
         private transient int firstReaderHoldCount;
 
         Sync() {
+            /**
+             * 读状态
+             */
             readHolds = new ThreadLocalHoldCounter();
             setState(getState()); // ensures visibility of readHolds
         }
@@ -217,6 +219,7 @@ public class ReentrantReadWriteLock
         abstract boolean writerShouldBlock();
 
         /**
+         * 尝试释放锁
          * @param releases
          * @return
          */
@@ -232,6 +235,11 @@ public class ReentrantReadWriteLock
             return free;
         }
 
+        /**
+         * 尝试获取锁
+         * @param acquires
+         * @return
+         */
         protected final boolean tryAcquire(int acquires) {
             /*
              * Walkthrough:
@@ -365,6 +373,7 @@ public class ReentrantReadWriteLock
         }
 
         /**
+         * 获取锁
          * Full version of acquire for reads, that handles CAS misses
          * and reentrant reads not dealt with in tryAcquireShared.
          */
