@@ -220,6 +220,7 @@ public class ReentrantReadWriteLock
 
         /**
          * 尝试释放锁
+         *
          * @param releases
          * @return
          */
@@ -237,6 +238,7 @@ public class ReentrantReadWriteLock
 
         /**
          * 尝试获取锁
+         *
          * @param acquires
          * @return
          */
@@ -416,9 +418,11 @@ public class ReentrantReadWriteLock
                     throw new Error("Maximum lock count exceeded");
                 if (compareAndSetState(c, c + SHARED_UNIT)) {
                     if (sharedCount(c) == 0) {
+                        //如果读锁为，设置读为当前线程。
                         firstReader = current;
                         firstReaderHoldCount = 1;
                     } else if (firstReader == current) {
+                        //如果读线程为当前线程，设置读的次数+1
                         firstReaderHoldCount++;
                     } else {
                         if (rh == null)
@@ -436,9 +440,7 @@ public class ReentrantReadWriteLock
         }
 
         /**
-         * Performs tryLock for write, enabling barging in both modes.
-         * This is identical in effect to tryAcquire except for lack
-         * of calls to writerShouldBlock.
+         * 尝试获取写锁
          */
         final boolean tryWriteLock() {
             Thread current = Thread.currentThread();
@@ -446,8 +448,10 @@ public class ReentrantReadWriteLock
             if (c != 0) {
                 int w = exclusiveCount(c);
                 if (w == 0 || current != getExclusiveOwnerThread())
+                    //写线程为0 或者 当前线程 不等于 当前锁持有人。
                     return false;
                 if (w == MAX_COUNT)
+                    //如果锁次数已经当最大值
                     throw new Error("Maximum lock count exceeded");
             }
             if (!compareAndSetState(c, c + 1))
