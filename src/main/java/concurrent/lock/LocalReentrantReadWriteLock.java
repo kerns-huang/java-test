@@ -219,12 +219,13 @@ public class LocalReentrantReadWriteLock {
             /**
              * 解锁的时候，当前是否存在写线程，如果写线程存在，没办法解锁。
              */
-            int count = lock.counter.get();
-            //判断是否有写锁在
-            if (lock.counter.compareAndSet(count, count - 1)) {
-                return true;
-            } else {
-                return false;
+            for(;;) {
+                int count = lock.counter.get();
+                //判断是否有写锁在
+                if (lock.counter.compareAndSet(count, count - 1)) {
+                    //判断
+                    return count == 0;
+                }
             }
         }
 
