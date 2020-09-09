@@ -1,11 +1,8 @@
 package concurrent.lock;
 
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -15,7 +12,6 @@ import java.util.concurrent.locks.LockSupport;
  * @create 2020-03-25 下午2:18
  **/
 public class LocalReentrantLock  {
-
 
     private AtomicReference<Thread> owner;
     /**
