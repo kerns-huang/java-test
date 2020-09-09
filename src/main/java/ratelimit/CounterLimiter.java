@@ -7,7 +7,7 @@ package ratelimit;
  * @author xiaohei
  * @create 2020-09-06 下午7:54
  **/
-public class CounterLimit {
+public class CounterLimiter {
     /**
      * 限流的时间戳
      */
