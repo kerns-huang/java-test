@@ -16,9 +16,9 @@ package ratelimit;
  **/
 public class SlidingWindowLimiter {
     /**
-     * 每个窗口的请求数
+     * 每个窗口的请求数,windowSize 的两倍
      */
-    private int[] windowRequestNum;
+    private int[] timeSlices;
     /**
      * 多少个时间窗口
      **/
@@ -32,9 +32,17 @@ public class SlidingWindowLimiter {
      */
     private int timeMillisPerSlice;
     /**
-     * 支持多少个线程并发
+     * 在一个完整窗口期内能达到的最大线程数
      */
     private int threadHold;
+    /**
+     * 开始时间
+     */
+    private long beginTime;
+    /**
+     * 结束时间
+     */
+    private long lastTime;
 
     public SlidingWindowLimiter(int timeMillisPerSlice, int windowSize, int threadHold) {
         this.timeMillisPerSlice = timeMillisPerSlice;
@@ -43,8 +51,35 @@ public class SlidingWindowLimiter {
     }
 
 
-    public static void main(String[] args) {
 
+   void addCount(int count){
+
+   }
+
+   private void reset(){
+
+   }
+   private void print(){
+     for(int i:timeSlices){
+         System.out.print(i+"-");
+     }
+   }
+
+    /**
+     * 获取当前时间片的位置。
+     * @return
+     */
+   private int currentIndex(){
+       long now= System.currentTimeMillis();
+       return 0;
+   }
+
+    public static void main(String[] args) {
+        SlidingWindowLimiter window = new SlidingWindowLimiter(100, 4, 8);
+        for (int i = 0; i < 100; i++) {
+
+
+        }
 
     }
 }
