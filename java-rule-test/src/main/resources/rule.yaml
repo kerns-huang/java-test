@@ -1,0 +1,19 @@
+InterfaceReturnCodes:
+  -- {"id"}
+  -- {}
+params:
+  {"test"}
+name: "1"
+description: "1"
+condition: "map.get('interfaceValue') > 18"
+priority: 1
+actions:
+  - "map.put('attrValue',12);"
+---
+name: "2"
+description: "2"
+condition: "map.get('interfaceValue') <26"
+priority: 2
+actions:
+  - "map.put('attrValue',12);"
+  ​
