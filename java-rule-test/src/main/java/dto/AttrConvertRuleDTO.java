@@ -12,9 +12,9 @@ import java.util.Map;
 @Data
 public class AttrConvertRuleDTO {
     /**
-     * 关联的接口返回值做为动态入参
+     * 动态字段，关联的接口或者关联表里面的某个字段，根据这个字段来做规则转换
      */
-    private List<String> interfaceReturnParam;
+    private List<String> dynamicParams;
     /**
      * 常规如餐，直接写死
      */

@@ -25,13 +25,9 @@ public class MapResultRuleTest {
 
         //创建规则1
         Rule ageRule = new MVELRule()
-                .name("age rule")
-                .description("Check if person's age is > 18 and marks the person as adult")
                 .priority(1)
                 .when("map.get('interfaceValue') <= '2018-09-20'")
                 .then("map.put('attrValue',12);");
-
-
         Rules rules = new Rules();
         rules.register(ageRule);
 

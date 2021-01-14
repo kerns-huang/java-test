@@ -1,14 +1,13 @@
-InterfaceReturnCodes:
-  -- {"id"}
-  -- {}
+dynamicParams:
+  -- "id"
 params:
-  {"test"}
+  -- {"test":null}
 name: "1"
 description: "1"
-condition: "map.get('interfaceValue') > 18"
+condition: " id > 18 "
 priority: 1
 actions:
-  - "map.put('attrValue',12);"
+  - "test=1;"
 ---
 name: "2"
 description: "2"

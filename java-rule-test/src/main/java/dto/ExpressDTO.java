@@ -2,6 +2,8 @@ package dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author xiaohei
  * @create 2021-01-14 上午11:14
@@ -15,9 +17,9 @@ public class ExpressDTO {
     /**
      * 期待的返回值
      */
-    private Object expect;
+    private List<String> actionList;
     /**
      * 优先级
      */
-    private String priority;
+    private Integer priority;
 }
